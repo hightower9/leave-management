@@ -18,25 +18,25 @@ export default function ProjectsPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
-  
+
   if (!user) {
     return null;
   }
-  
+
   // Filter projects by user access (all for admin, only assigned for members)
   const accessibleProjects = isAdmin 
     ? projects 
     : projects.filter(project => project.members.includes(user.id));
-  
+
   // Filter projects by search query
   const filteredProjects = accessibleProjects.filter(project => 
     project.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
-  
+
   const navigateToProject = (projectId: string) => {
     router.push(`/projects/${projectId}`);
   };
-  
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -47,7 +47,7 @@ export default function ProjectsPage() {
               Manage projects and team availability
             </p>
           </div>
-          
+
           {isAdmin && (
             <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
               <DialogTrigger asChild>
@@ -68,7 +68,7 @@ export default function ProjectsPage() {
             </Dialog>
           )}
         </div>
-        
+
         <div className="flex items-center gap-2">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -81,7 +81,7 @@ export default function ProjectsPage() {
             />
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProjects.length === 0 ? (
             <div className="col-span-full">
@@ -100,61 +100,20 @@ export default function ProjectsPage() {
               </Card>
             </div>
           ) : (
-            filteredProjects.map((project) => {
-              const projectMembers = getUsersByProjectId(project.id);
-              
-              return (
-                <Card key={project.id} className="overflow-hidden hover:shadow-md transition-shadow">
-                  <CardHeader className="bg-primary/5 dark:bg-primary/10">
-                    <CardTitle>{project.name}</CardTitle>
-                    <CardDescription>
-                      {project.notes || "No description provided"}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-4">
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center gap-2">
-                        <Users size={16} className="text-muted-foreground" />
-                        <span className="text-sm">
-                          {projectMembers.length} team {projectMembers.length === 1 ? 'member' : 'members'}
-                        </span>
-                      </div>
-                      
-                      <div className="flex flex-wrap gap-1">
-                        {projectMembers.slice(0, 3).map((member) => (
-                          <Badge variant="outline" key={member.id}>
-                            {member.firstName} {member.lastName}
-                          </Badge>
-                        ))}
-                        {projectMembers.length > 3 && (
-                          <Badge variant="outline">
-                            +{projectMembers.length - 3} more
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-between pt-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="gap-1"
-                      onClick={() => navigateToProject(project.id)}
-                    >
-                      <Calendar size={14} />
-                      View Calendar
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => navigateToProject(project.id)}
-                    >
-                      View Details
-                    </Button>
-                  </CardFooter>
-                </Card>
-              );
-            })
+            filteredProjects.map((project) => (
+            <Card key={project.id} className="overflow-hidden hover:shadow-md transition-shadow">
+              <CardHeader className="bg-primary/5 dark:bg-primary/10">
+                <CardTitle>{project.name}</CardTitle>
+              </CardHeader>
+              <CardFooter className="flex justify-end pt-2">
+                <Button 
+                  onClick={() => navigateToProject(project.id)}
+                >
+                  View Project
+                </Button>
+              </CardFooter>
+            </Card>
+          ))
           )}
         </div>
       </div>
