@@ -74,8 +74,8 @@ export function ProjectForm({ onClose, projectId }: ProjectFormProps) {
         const newProject = {
           id: (safeProjects.length + 1).toString(),
           name: projectName,
-          members: selectedMembers,
           notes: projectNotes,
+          members: selectedMembers,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -91,8 +91,8 @@ export function ProjectForm({ onClose, projectId }: ProjectFormProps) {
       onClose();
     } catch (error) {
       toast({
-        title: "Failed to save project",
-        description: "An error occurred while saving the project",
+        title: "Error",
+        description: "Failed to save the project. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -124,7 +124,7 @@ export function ProjectForm({ onClose, projectId }: ProjectFormProps) {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0" align="start">
+        <PopoverContent className="w-full p-0">
           <Command>
             <CommandInput placeholder="Search members..." />
             <CommandEmpty>No member found.</CommandEmpty>
@@ -147,7 +147,7 @@ export function ProjectForm({ onClose, projectId }: ProjectFormProps) {
                       selectedMembers.includes(user.id) ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  {user.firstName} {user.lastName} - {user.jobDescription}
+                  {user.firstName} {user.lastName}
                 </CommandItem>
               ))}
             </CommandGroup>
