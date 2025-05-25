@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -32,12 +33,10 @@ export function ProjectForm({ onClose, projectId }: ProjectFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Ensure arrays are properly initialized
   const safeProjects = projects ?? [];
   const safeUsers = users ?? [];
   const safeMemberUsers = safeUsers.filter(user => user?.role === 'member') ?? [];
   
-  // If projectId is provided, find the project for editing
   const existingProject = projectId ? safeProjects.find(p => p?.id === projectId) : null;
   
   const [projectName, setProjectName] = useState(existingProject?.name || '');
@@ -47,27 +46,21 @@ export function ProjectForm({ onClose, projectId }: ProjectFormProps) {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
     try {
-      setIsSubmitting(true);
-    
-    try {
-      // Validate inputs
       if (!projectName.trim()) {
         toast({
           title: "Missing information",
           description: "Please provide a project name",
           variant: "destructive",
         });
-        setIsSubmitting(false);
         return;
       }
       
-      // Mock API call - in a real app, this would be a server action
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       if (existingProject) {
-        // Update existing project
         existingProject.name = projectName;
         existingProject.notes = projectNotes;
         existingProject.members = selectedMembers;
@@ -78,7 +71,6 @@ export function ProjectForm({ onClose, projectId }: ProjectFormProps) {
           description: "The project has been updated successfully",
         });
       } else {
-        // Create new project
         const newProject = {
           id: (safeProjects.length + 1).toString(),
           name: projectName,
@@ -108,7 +100,6 @@ export function ProjectForm({ onClose, projectId }: ProjectFormProps) {
     }
   };
   
-  // Only render the Command component if we have member users to display
   const renderMemberSelector = () => {
     if (!safeMemberUsers?.length) {
       return (

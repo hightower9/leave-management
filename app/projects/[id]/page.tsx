@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -49,22 +50,15 @@ export default function ProjectPage({ params }: { params: { id: string } }) {
 
   const handleDeleteProject = async () => {
     try {
-      // Mock API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Find the index of the project to delete
       const projectIndex = projects.findIndex(p => p.id === id);
-
-      // Remove the project from the array
       if (projectIndex !== -1) {
         projects.splice(projectIndex, 1);
       }
-
       toast({
         title: "Project deleted",
         description: "The project has been deleted successfully",
       });
-
       router.push('/projects');
     } catch (error) {
       toast({
