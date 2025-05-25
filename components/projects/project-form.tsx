@@ -47,7 +47,9 @@ export function ProjectForm({ onClose, projectId }: ProjectFormProps) {
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    
+    try {
+      setIsSubmitting(true);
     
     try {
       // Validate inputs
