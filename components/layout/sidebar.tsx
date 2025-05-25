@@ -13,6 +13,7 @@ import {
   Settings, 
   ChevronLeft,
   ChevronRight,
+  User,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -84,7 +85,7 @@ export function Sidebar() {
               </div>
             </div>
           )}
-          
+
           {!isMobile && (
             <Button 
               variant="ghost" 
@@ -114,6 +115,12 @@ export function Sidebar() {
             href="/projects" 
             icon={<Briefcase size={20} />} 
             label="Projects" 
+            isCollapsed={isCollapsed} 
+          />
+          <SidebarLink 
+            href="/profile" 
+            icon={<User size={20} />} 
+            label="Profile" 
             isCollapsed={isCollapsed} 
           />
           {isAdmin && (
