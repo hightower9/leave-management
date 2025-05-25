@@ -1,6 +1,6 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -12,13 +12,12 @@ const nextConfig = {
         options: { 
           subsets: ['latin'],
           display: 'swap',
-          timeout: 10000 // Increased timeout to 10 seconds
+          timeout: 10000
         },
       },
     ],
   },
   webpack: (config, { dev, isServer }) => {
-    // Disable caching in development to prevent file system errors
     if (dev) {
       config.cache = false;
     }
