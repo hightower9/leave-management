@@ -1,17 +1,17 @@
+
 'use client';
 
 import { useState } from 'react';
 import { MainLayout } from '@/components/layout/main-layout';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Search, Plus, Calendar, Users, Briefcase } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth-provider';
-import { projects, getUsersByProjectId } from '@/lib/data';
+import { projects } from '@/lib/data';
 import { ProjectForm } from '@/components/projects/project-form';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 export default function ProjectsPage() {
   const { user, isAdmin } = useAuth();
@@ -69,7 +69,7 @@ export default function ProjectsPage() {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mb-6">
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -82,40 +82,46 @@ export default function ProjectsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredProjects.length === 0 ? (
-            <div className="col-span-full">
-              <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
-                  <Briefcase className="h-12 w-12 text-muted-foreground/50 mb-4" />
-                  <p className="text-lg font-medium">No projects found</p>
-                  <p className="text-muted-foreground">
-                    {searchQuery 
-                      ? "Try adjusting your search query" 
-                      : isAdmin 
-                        ? "Create a new project to get started" 
-                        : "You are not assigned to any projects yet"}
-                  </p>
-                </CardContent>
-              </Card>
+        {filteredProjects.length === 0 ? (
+          <div className="text-center py-12 border rounded-lg bg-background">
+            <div className="flex flex-col items-center gap-2">
+              <Search className="h-8 w-8 text-muted-foreground/50" />
+              <p className="text-lg font-medium">No projects found</p>
+              <p className="text-muted-foreground">
+                {searchQuery 
+                  ? "Try adjusting your search query" 
+                  : isAdmin 
+                    ? "Create a new project to get started" 
+                    : "You are not assigned to any projects yet"}
+              </p>
             </div>
-          ) : (
-            filteredProjects.map((project) => (
-            <Card key={project.id} className="overflow-hidden hover:shadow-md transition-shadow">
-              <CardHeader className="bg-primary/5 dark:bg-primary/10">
-                <CardTitle>{project.name}</CardTitle>
-              </CardHeader>
-              <CardFooter className="flex justify-end pt-2">
-                <Button 
-                  onClick={() => navigateToProject(project.id)}
-                >
-                  View Project
-                </Button>
-              </CardFooter>
-            </Card>
-          ))
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Project Name</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredProjects.map((project) => (
+                  <TableRow key={project.id}>
+                    <TableCell className="font-medium">{project.name}</TableCell>
+                    <TableCell className="text-right">
+                      <Button 
+                        onClick={() => navigateToProject(project.id)}
+                      >
+                        View Project
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )}
       </div>
     </MainLayout>
   );
