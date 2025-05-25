@@ -32,17 +32,17 @@ interface ProjectFormProps {
 export function ProjectForm({ onClose, projectId }: ProjectFormProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+  const [open, setOpen] = useState(false);
+
   const safeProjects = projects ?? [];
   const safeUsers = users ?? [];
-  const safeMemberUsers = safeUsers.filter(user => user?.role === 'member') ?? [];
+  const memberUsers = safeUsers.filter(user => user.role === 'member');
   
-  const existingProject = projectId ? safeProjects.find(p => p?.id === projectId) : null;
+  const existingProject = projectId ? safeProjects.find(p => p.id === projectId) : null;
   
   const [projectName, setProjectName] = useState(existingProject?.name || '');
   const [projectNotes, setProjectNotes] = useState(existingProject?.notes || '');
   const [selectedMembers, setSelectedMembers] = useState<string[]>(existingProject?.members || []);
-  const [open, setOpen] = useState(false);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,8 +74,8 @@ export function ProjectForm({ onClose, projectId }: ProjectFormProps) {
         const newProject = {
           id: (safeProjects.length + 1).toString(),
           name: projectName,
-          members: selectedMembers,
           notes: projectNotes,
+          members: selectedMembers,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
@@ -91,72 +91,15 @@ export function ProjectForm({ onClose, projectId }: ProjectFormProps) {
       onClose();
     } catch (error) {
       toast({
-        title: "Failed to save project",
-        description: "An error occurred while saving the project",
+        title: "Error",
+        description: "Failed to save the project. Please try again.",
         variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
     }
   };
-  
-  const renderMemberSelector = () => {
-    if (!safeMemberUsers?.length) {
-      return (
-        <div className="text-sm text-muted-foreground">
-          No team members available
-        </div>
-      );
-    }
 
-    return (
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between"
-          >
-            {selectedMembers.length > 0
-              ? `${selectedMembers.length} members selected`
-              : "Select team members"}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-full p-0" align="start">
-          <Command>
-            <CommandInput placeholder="Search members..." />
-            <CommandEmpty>No member found.</CommandEmpty>
-            <CommandGroup className="max-h-64 overflow-auto">
-              {safeMemberUsers.map((user) => (
-                <CommandItem
-                  key={user.id}
-                  value={user.id}
-                  onSelect={() => {
-                    setSelectedMembers(prev => 
-                      prev.includes(user.id)
-                        ? prev.filter(id => id !== user.id)
-                        : [...prev, user.id]
-                    );
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedMembers.includes(user.id) ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {user.firstName} {user.lastName} - {user.jobDescription}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    );
-  };
-  
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
@@ -182,12 +125,55 @@ export function ProjectForm({ onClose, projectId }: ProjectFormProps) {
       
       <div className="space-y-2">
         <Label>Team Members</Label>
-        {renderMemberSelector()}
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-full justify-between"
+            >
+              {selectedMembers.length > 0
+                ? `${selectedMembers.length} members selected`
+                : "Select team members"}
+              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0">
+            <Command>
+              <CommandInput placeholder="Search members..." />
+              <CommandEmpty>No member found.</CommandEmpty>
+              <CommandGroup className="max-h-64 overflow-auto">
+                {memberUsers.map((user) => (
+                  <CommandItem
+                    key={user.id}
+                    value={user.id}
+                    onSelect={() => {
+                      setSelectedMembers(prev => 
+                        prev.includes(user.id)
+                          ? prev.filter(id => id !== user.id)
+                          : [...prev, user.id]
+                      );
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selectedMembers.includes(user.id) ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {user.firstName} {user.lastName}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </Command>
+          </PopoverContent>
+        </Popover>
         
         {selectedMembers.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
             {selectedMembers.map(memberId => {
-              const member = safeMemberUsers.find(u => u?.id === memberId);
+              const member = memberUsers.find(u => u.id === memberId);
               if (!member) return null;
               
               return (
