@@ -93,7 +93,9 @@ export function ProjectCalendar({ projectId }: ProjectCalendarProps) {
               fontWeight: 'bold',
             },
             holiday: {
-              backgroundColor: 'hsla(var(--chart-1) / 0.2)',
+              backgroundColor: 'hsla(var(--destructive) / 0.2)',
+              color: 'hsl(var(--destructive))',
+              fontWeight: '500',
             }
           }}
         />

@@ -6,12 +6,13 @@ import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth-provider';
-import { projects } from '@/lib/data';
+import { projects, getUsersByProjectId } from '@/lib/data';
 import { ProjectForm } from '@/components/projects/project-form';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 
 export default function ProjectsPage() {
   const { user, isAdmin } = useAuth();
@@ -82,46 +83,61 @@ export default function ProjectsPage() {
           </div>
         </div>
 
-        {filteredProjects.length === 0 ? (
-          <div className="text-center py-12 border rounded-lg bg-background">
-            <div className="flex flex-col items-center gap-2">
-              <Search className="h-8 w-8 text-muted-foreground/50" />
-              <p className="text-lg font-medium">No projects found</p>
-              <p className="text-muted-foreground">
-                {searchQuery 
-                  ? "Try adjusting your search query" 
-                  : isAdmin 
-                    ? "Create a new project to get started" 
-                    : "You are not assigned to any projects yet"}
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Project Name</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Team Members</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredProjects.length === 0 ? (
                 <TableRow>
-                  <TableHead>Project Name</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableCell colSpan={4} className="text-center py-6">
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <Users className="h-8 w-8 text-muted-foreground/50" />
+                      <p className="text-muted-foreground">
+                        {searchQuery 
+                          ? "Try adjusting your search query" 
+                          : isAdmin 
+                            ? "Create a new project to get started" 
+                            : "You are not assigned to any projects yet"}
+                      </p>
+                    </div>
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredProjects.map((project) => (
-                  <TableRow key={project.id}>
-                    <TableCell className="font-medium">{project.name}</TableCell>
-                    <TableCell className="text-right">
-                      <Button 
-                        onClick={() => navigateToProject(project.id)}
-                      >
-                        View Project
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
+              ) : (
+                filteredProjects.map((project) => {
+                  const memberCount = getUsersByProjectId(project.id).length;
+                  return (
+                    <TableRow key={project.id}>
+                      <TableCell className="font-medium">{project.name}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {project.notes || 'No description'}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">
+                          <Users className="h-3 w-3 mr-1" />
+                          {memberCount} {memberCount === 1 ? 'member' : 'members'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button 
+                          onClick={() => navigateToProject(project.id)}
+                        >
+                          View Project
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </MainLayout>
   );
